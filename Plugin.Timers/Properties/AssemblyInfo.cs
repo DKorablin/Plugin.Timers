@@ -18,5 +18,5 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: AssemblyCompany("Danila Korablin")]
 [assembly: AssemblyProduct("Plugin.Timers")]
-[assembly: AssemblyCopyright("Copyright © Danila Korablin 2018-2020")]
+[assembly: AssemblyCopyright("Copyright © Danila Korablin 2018-2024")]
 #endif
