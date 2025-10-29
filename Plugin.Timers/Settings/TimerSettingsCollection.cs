@@ -21,7 +21,7 @@ namespace Plugin.Timers.Settings
 		/// <summary>Change timer name to ensure uniqueness</summary>
 		/// <param name="item">Timer for name change</param>
 		/// <param name="newTimerName">new timer name</param>
-		/// <returns>Timer name succesfully changed or timer with newTimerName already exists</returns>
+		/// <returns>Timer name successfully changed or timer with newTimerName already exists</returns>
 		public Boolean ChangeTimerName(TimerSettingsItem item, String newTimerName)
 		{
 			if(this.ContainsTimer(newTimerName))
@@ -55,7 +55,7 @@ namespace Plugin.Timers.Settings
 
 		public void AddWithCheck(TimerSettingsItem item)
 		{
-			item.TimerName = GetUniqueTimerName(item.TimerName);
+			item.TimerName = this.GetUniqueTimerName(item.TimerName);
 			this.Add(item);
 		}
 

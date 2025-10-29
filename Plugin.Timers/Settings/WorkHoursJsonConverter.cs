@@ -14,9 +14,9 @@ namespace Plugin.Timers.Settings
 			if(!dictionary.TryGetValue("Code", out Object value))
 				unboxed = WorkHours.MaxWorkHours;
 			else if(value is Int32 i)
-				unboxed = (Int32)i;
+				unboxed = i;
 			else if(value is Int64 l)
-				unboxed= (Int64)l;
+				unboxed= l;
 			else
 				unboxed = WorkHours.MaxWorkHours;
 

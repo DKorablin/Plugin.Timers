@@ -21,7 +21,7 @@ namespace Plugin.Timers
 		/// <summary>Start timer trigger interval on first launch</summary>
 		protected Double StartInterval => this._settings.StartInterval.TotalMilliseconds;
 
-		/// <summary>Pointer to plugin logic whitch will be passed on timer invocation</summary>
+		/// <summary>Pointer to plugin logic which will be passed on timer invocation</summary>
 		protected Object State { get; set; }
 
 		/// <summary>Pointer to callback method</summary>

@@ -9,9 +9,9 @@ namespace Plugin.Timers
 	{
 		/// <summary>Create instance of <see cref="System.Windows.Forms.Timer"/></summary>
 		/// <param name="trace">Trace source to store plugins exceptions</param>
-		/// <param name="settings">Настройки таймеров</param>
-		/// <param name="state">Указатель, который будет передан при срабатывании таймера</param>
-		/// <param name="callback">Указатель на метод обратного вызова</param>
+		/// <param name="settings">Timer settings</param>
+		/// <param name="state">Pointer to be passed when the timer fires</param>
+		/// <param name="callback">Pointer to the callback method</param>
 		public WindowsTimerItem(TraceSource trace, TimerSettingsItem settings, Object state, EventHandler<EventArgs> callback)
 			: base(trace, settings, state, callback)
 		{

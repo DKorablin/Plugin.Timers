@@ -50,6 +50,7 @@ namespace Plugin.Timers
 		/// <summary>Check for timer existence by name</summary>
 		/// <param name="timerName">Name of the timer</param>
 		/// <returns>A timer with same name exists</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="timerName"/> is required</exception>
 		public Boolean IsTimerExists(String timerName)
 		{
 			if(String.IsNullOrEmpty(timerName))
@@ -62,7 +63,8 @@ namespace Plugin.Timers
 		/// <param name="key">Timer key that will be used as unique timer identifier</param>
 		/// <param name="timerName">Name of the settings for the timer operation (Editable in the plugin settings)</param>
 		/// <param name="callback">Callback method that will be invoked when timer fires</param>
-		/// <param name="state">Object reference that will be pased to callback method</param>
+		/// <param name="state">Object reference that will be passed to callback method</param>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/>, <paramref name="timerName"/> and <paramref name="callback"/> are required arguments</exception>
 		public void RegisterTimer(String key, String timerName, EventHandler<EventArgs> callback, Object state)
 		{
 			if(String.IsNullOrEmpty(key))
@@ -82,9 +84,10 @@ namespace Plugin.Timers
 			}
 		}
 
-		/// <summary>Unrefister timer by name</summary>
+		/// <summary>Unregister timer by name</summary>
 		/// <param name="key">Unique timer identifier to stop and remove from active timers list</param>
 		/// <returns>Timer stopped and removed</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> can't be null or empty</exception>"
 		public Boolean UnregisterTimer(String key)
 		{
 			if(String.IsNullOrEmpty(key))
@@ -95,8 +98,8 @@ namespace Plugin.Timers
 
 		/// <summary>Manually call timer callback method that is called by the timer</summary>
 		/// <param name="key">The unique key of the timer whose method should be called</param>
-		/// <exception cref="ArgumentNullException"><c>key</c> can't be null or empty</exception>
-		/// <exception cref="InvalidOperationException">Timer with this key not found</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="key"/> can't be null or empty</exception>
+		/// <exception cref="InvalidOperationException">Timer with this <paramref name="key"/> not found</exception>
 		public void InvokeTimer(String key)
 		{
 			if(String.IsNullOrEmpty(key))

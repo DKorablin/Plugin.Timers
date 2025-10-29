@@ -8,7 +8,7 @@ namespace Plugin.Timers
 {
 	public class PluginSettings
 	{
-		private static TimerSettingsItem StaticSettings = new TimerSettingsItem()
+		private static readonly TimerSettingsItem StaticSettings = new TimerSettingsItem()
 		{
 			TimerName = "Default",
 		};
@@ -32,10 +32,10 @@ namespace Plugin.Timers
 		}
 
 		[Browsable(false)]
-		public String TimerDataJson { get; set; }//WARN: Не открывать наружу, ибо будет рассинхрон между TimerData и TimerDataJson
+		public String TimerDataJson { get; set; }//WARN: Do not open it externally, as this will cause a desynchronization between TimerData and TimerDataJson.
 
 		[Browsable(false)]
-		public String DefaultJson { get; set; }//WARN: Не открывать наружу, ибо будет рассинхрон между Default и DefaultJson
+		public String DefaultJson { get; set; }//WARN: Do not open it externally, as this will cause a desynchronization between Default and DefaultJson.
 
 		[Category("Data")]
 		[Description("Default timer settings for new or unknown timers")]
@@ -71,7 +71,7 @@ namespace Plugin.Timers
 			if(result == null)
 			{
 				result = new TimerSettingsItem(this.Default) { TimerName = timerName, };
-				this._plugin.Trace.TraceEvent(TraceEventType.Verbose, 1, $"Timers -> Settings for timer {timerName} not found. Using {this.Default.TimerName} timer");
+				this._plugin.Trace.TraceEvent(TraceEventType.Verbose, 1, $"Timers -> Settings for timer '{timerName}' not found. Using default '{this.Default.TimerName}' timer");
 
 				this.TimerData.Add(result);
 				this.SaveSettings();
@@ -79,7 +79,7 @@ namespace Plugin.Timers
 
 			if(result.SingleInstance && !InstanceManager.CreateSingleInstance(timerName, null))
 			{
-				this._plugin.Trace.TraceEvent(TraceEventType.Stop, 1, "Timers -> Anoter timer with name {0} already running", timerName);
+				this._plugin.Trace.TraceEvent(TraceEventType.Stop, 1, "Timers -> Another timer with the same name '{0}' already running", timerName);
 				return null;
 			}
 			return result;
@@ -94,18 +94,18 @@ namespace Plugin.Timers
 			this._plugin.Host.Plugins.Settings(this._plugin).SaveAssemblyParameters();
 		}
 
-		/// <summary>Десериализовать строку в объект</summary>
-		/// <typeparam name="T">Тип объекта</typeparam>
-		/// <param name="json">Строка в формате JSON</param>
-		/// <returns>Десериализованный объект</returns>
+		/// <summary>Deserialize a string into an object</summary>
+		/// <typeparam name="T">Object type</typeparam>
+		/// <param name="json">String in JSON format</param>
+		/// <returns>Deserialized object</returns>
 		internal static T JavaScriptDeserialize<T>(String json)
 			=> String.IsNullOrEmpty(json)
 				? default
 				: PluginSettings.Serializer.Deserialize<T>(json);
 
-		/// <summary>Сериализовать объект</summary>
-		/// <param name="item">Объект для сериализации</param>
-		/// <returns>Строка в формате JSON</returns>
+		/// <summary>Serialize object</summary>
+		/// <param name="item">Object to serialize</param>
+		/// <returns>String in JSON format</returns>
 		internal static String JavaScriptSerialize(Object item)
 			=> item == null
 				? null

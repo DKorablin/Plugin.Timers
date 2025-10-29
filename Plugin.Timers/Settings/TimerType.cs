@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Plugin.Timers.Settings
+﻿namespace Plugin.Timers.Settings
 {
-	/// <summary>Тип таймера</summary>
+	/// <summary>The list of available timer types</summary>
 	public enum TimerType
 	{
 		/// <summary>System.Timers.Timer</summary>

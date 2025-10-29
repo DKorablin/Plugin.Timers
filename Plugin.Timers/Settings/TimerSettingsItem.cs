@@ -8,7 +8,6 @@ namespace Plugin.Timers.Settings
 	/// <summary>Timer settings</summary>
 	public class TimerSettingsItem : INotifyPropertyChanged
 	{
-		#region Fields
 		private String _timerName;
 		private String _description;
 		private TimeSpan _startInterval = new TimeSpan(0, 0, 1);
@@ -18,7 +17,6 @@ namespace Plugin.Timers.Settings
 		private Int32 _workDays = 127;
 		private WorkHours _workHours = new WorkHours();
 		private WorkHours _sleepHours = new WorkHours();
-		#endregion Fields
 
 		/// <summary>The name of the timer that can be used by a third-party plugin to bind to the timer settings</summary>
 		[Category("Details")]

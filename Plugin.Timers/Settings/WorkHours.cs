@@ -3,15 +3,15 @@ using System.Diagnostics;
 
 namespace Plugin.Timers.Settings
 {
-	/// <summary>Часы работы таймера</summary>
+	/// <summary>Timer operating hours</summary>
 	[DebuggerDisplay(nameof(Code))]
 	public class WorkHours
 	{
-		/// <summary>Максимальный промежуток времени: <c>23:59:58 - 23:59:59</c></summary>
+		/// <summary>Maximum time interval: <c>23:59:58 - 23:59:59</c></summary>
 		public const Int64 MaxWorkHours = 371080879493502;
-		/// <summary>Минимальный промежуток времени: <c>0:00:00 - 23:59:59</c></summary>
+		/// <summary>Minimum time interval: <c>0:00:00 - 23:59:59</c></summary>
 		public const Int64 MinWorkHours = 0;
-		/// <summary>Максимальное количество секунд для таймера: <c>23:59:59</c></summary>
+		/// <summary>Maximum number of seconds for the timer: <c>23:59:59</c></summary>
 		private const Int32 MaxSeconds = 86399;
 
 		/// <summary>Time interval storage</summary>
@@ -97,7 +97,7 @@ namespace Plugin.Timers.Settings
 		{ }
 
 		/// <summary>ctor</summary>
-		/// <param name="code">Код из базы</param>
+		/// <param name="code">Code from the base</param>
 		/// <exception cref="OverflowException">Invalid code specified</exception>
 		public WorkHours(Int64 code)
 			=>this.Code = WorkHours.IsValid(code)
@@ -112,8 +112,8 @@ namespace Plugin.Timers.Settings
 		public override Int32 GetHashCode()
 			=> this.Code.GetHashCode();
 
-		/// <summary>Строковое представление часов работы сервиса</summary>
-		/// <returns>Строковой вид работы сервиса</returns>
+		/// <summary>String representation of service operation hours</summary>
+		/// <returns>String representation of service operation hours</returns>
 		public override String ToString()
 		{
 			TimeSpan start = this.StartTimeSpan;
@@ -127,7 +127,7 @@ namespace Plugin.Timers.Settings
 		private static Boolean IsValid(Int64 code)
 		{
 			if(code == 0)
-				return true;//По умолчанию, время передаётся в формате от 0 до 23:59
+				return true;//By default, time is transmitted in the format from 0 to 23:59
 			if(code < WorkHours.MinWorkHours || code > WorkHours.MaxWorkHours)
 				return false;//0:00:00 - 23:59:59
 
@@ -139,7 +139,7 @@ namespace Plugin.Timers.Settings
 		private static Boolean IsValid(TimeSpan start, TimeSpan end)
 			=> WorkHours.IsValid((Int32)start.TotalSeconds, (Int32)end.TotalSeconds);
 
-		/// <summary>//Тут проверяем не на start<end, а именно min/max. Ибо рабочее время может быть с 22:00:00 до 9:00:00</summary>
+		/// <summary>//Here we check not for start&lt;end, but for min/max. Because working hours can be from 10:00:00 PM to 9:00:00 AM</summary>
 		private static Boolean IsValid(Int32 start, Int32 end)
 			=> start >= 0 && start <= WorkHours.MaxSeconds
 				&& end >= 0 && end <= WorkHours.MaxSeconds;

@@ -8,7 +8,7 @@ namespace Plugin.Timers
 	/// <summary>Timer factory to store all timers</summary>
 	internal class TimerFactory : IDisposable
 	{
-		private Dictionary<String, ITimerItem> _storage = new Dictionary<String, ITimerItem>();
+		private readonly Dictionary<String, ITimerItem> _storage = new Dictionary<String, ITimerItem>();
 
 		/// <summary>Add new timer to storage</summary>
 		/// <param name="trace">Trace object instance related to timer</param>
@@ -16,6 +16,7 @@ namespace Plugin.Timers
 		/// <param name="callback">Callback method called when the timer fires</param>
 		/// <param name="state">The object reference passed to the callback method</param>
 		/// <param name="settingsItem">The timer settings instance</param>
+		/// <exception cref="NotImplementedException">Unknown timer type specified</exception>
 		public void AddTimer(TraceSource trace, String key, EventHandler<EventArgs> callback, Object state, TimerSettingsItem settingsItem)
 		{
 			ITimerItem timerState;
@@ -49,7 +50,7 @@ namespace Plugin.Timers
 
 		/// <summary>Remove running timer my timer key</summary>
 		/// <param name="key">Timer key</param>
-		/// <returns>Timer succesfully found, removed and stopped</returns>
+		/// <returns>Timer found, removed and stopped</returns>
 		public Boolean RemoveTimer(String key)
 		{
 			if(this._storage.TryGetValue(key, out ITimerItem item))
@@ -63,7 +64,7 @@ namespace Plugin.Timers
 
 		/// <summary>Invoke timer callback manually</summary>
 		/// <param name="key">Timer key</param>
-		/// <returns>Timer suucesfully found and invoked</returns>
+		/// <returns>Timer found and invoked</returns>
 		public Boolean InvokeTimer(String key)
 		{
 			if(this._storage.TryGetValue(key, out ITimerItem item))

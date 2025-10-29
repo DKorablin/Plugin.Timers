@@ -33,7 +33,7 @@ namespace Plugin.Timers
 
 		/// <summary>Fatal exception that can't be handled by user code</summary>
 		/// <param name="exception">Exception that we will check</param>
-		/// <returns>Exception is fatal there is no reason to process it futher</returns>
+		/// <returns>Exception is fatal there is no reason to process it further</returns>
 		public static Boolean IsFatal(Exception exception)
 		{
 			while(exception != null)

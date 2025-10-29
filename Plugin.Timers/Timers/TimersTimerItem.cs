@@ -8,7 +8,7 @@ namespace Plugin.Timers
 	/// <summary>Timer from <see cref="System.Timers.Timer"/></summary>
 	internal class TimersTimerItem : TimerItemBase<System.Timers.Timer>, ITimerItem
 	{
-		/// <summary>Create instace of <see cref="System.Timers.Timer"/></summary>
+		/// <summary>Create instance of <see cref="System.Timers.Timer"/></summary>
 		/// <param name="trace">Trace logic to store plugin exceptions</param>
 		/// <param name="settings">Timer settings</param>
 		/// <param name="state">Pointer to object that will be passed to plugin on timer invocation</param>

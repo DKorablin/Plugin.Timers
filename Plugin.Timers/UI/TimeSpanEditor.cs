@@ -13,7 +13,7 @@ namespace Plugin.Timers
 
 		public override Object EditValue(ITypeDescriptorContext context, IServiceProvider provider, Object value)
 		{
-			IWindowsFormsEditorService frmsvr = null;
+			IWindowsFormsEditorService frmsvr;
 			frmsvr = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
 
 			if(frmsvr != null)

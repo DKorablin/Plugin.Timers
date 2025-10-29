@@ -18,7 +18,7 @@ namespace Plugin.Timers.UI
 		{
 			this._plugin = plugin ?? throw new ArgumentNullException(nameof(plugin));
 
-			InitializeComponent();
+			this.InitializeComponent();
 			this.DataBind();
 		}
 
@@ -28,7 +28,7 @@ namespace Plugin.Timers.UI
 		private void AddListItem(IEnumerable<TimerSettingsItem> proxyItems)
 		{
 			List<ListViewItem> itemsToAdd = new List<ListViewItem>();
-			String[] subItems = Array.ConvertAll<String, String>(new String[lvTimers.Columns.Count], delegate(String a) { return String.Empty; });
+			String[] subItems = Array.ConvertAll<String, String>(new String[lvTimers.Columns.Count], a => String.Empty);
 
 			foreach(TimerSettingsItem item in proxyItems)
 			{
@@ -80,7 +80,7 @@ namespace Plugin.Timers.UI
 			ListViewItem listItem = lvTimers.Items[e.Item];
 			TimerSettingsItem item = (TimerSettingsItem)listItem.Tag;
 			if(e.Label != null && e.Label != item.TimerName)
-			{//Отмена редактирования
+			{//Cancel editing
 				if(this._plugin.Settings.TimerData.ChangeTimerName(item, e.Label))
 					this._plugin.Settings.SaveSettings();
 				else
@@ -128,7 +128,7 @@ namespace Plugin.Timers.UI
 					timer.InvokeCallback();//Manually invoke callback method for all started timers
 			else if(e.ClickedItem == tsmiTimersStop)
 			{
-				//I make a separate copy because timers are deleted from Facrory when stopped
+				//I make a separate copy because timers are deleted from Factory when stopped
 				List<ITimerItem> timers = new List<ITimerItem>(this._plugin.Timers.GetTimers(settings.TimerName));
 				foreach(ITimerItem timer in timers)
 					timer.Stop();//Stop timer

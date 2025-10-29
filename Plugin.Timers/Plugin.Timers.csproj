@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>net48</TargetFrameworks>
+		<OutputType>Library</OutputType>
+		<RootNamespace>Plugin.Timers</RootNamespace>
+		<Deterministic>false</Deterministic>
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
+		<NoWarn>CA1416</NoWarn>
+	</PropertyGroup>
+
+	<!--nuspec-->
+	<PropertyGroup>
+		<PackageId>AlphaOmega.SAL.Plugin.Timers</PackageId>
+		<Version>$(Version)</Version>
+		<Title>Timers scheduler service plugin</Title>
+		<Description>Timers storage for service infrastructure. This is a core component for each service infrastructure where you need to invoke any process after some time.</Description>
+		<Authors>Danila Korablin</Authors>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>docs\README.md</PackageReadmeFile>
+		<PackageIcon>docs\SAL.100.png</PackageIcon>
+		<RepositoryUrl>https://github.com/DKorablin/Plugin.Timers</RepositoryUrl>
+		<PackageTags>SAL;plugin;service;timers</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="\docs" />
+		<None Include="..\Images.Shared\SAL.100.png" Pack="true" PackagePath="\docs" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<Optimize>true</Optimize>
+		<PublishSingleFile>true</PublishSingleFile>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+		<AssemblyAttributes Include="AssemblyMetadata">
+			<_Parameter1>ProjectUrl</_Parameter1>
+			<_Parameter2>https://github.com/DKorablin/Plugin.Timers</_Parameter2>
+		</AssemblyAttributes>
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+		<Reference Include="System.Runtime.Remoting"/>
+		<Reference Include="System.Web.Extensions"/>
+		<Reference Include="System.Windows.Forms"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SAL.Flatbed">
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
+	</ItemGroup>
+</Project>
