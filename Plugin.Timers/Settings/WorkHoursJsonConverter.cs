@@ -1,32 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Web.Script.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Plugin.Timers.Settings
 {
-	public class WorkHoursJsonConverter : JavaScriptConverter
+	public class WorkHoursJsonConverter : JsonConverter<WorkHours>
 	{
-		public override IEnumerable<Type> SupportedTypes => new[] { typeof(WorkHours), };
-
-		public override Object Deserialize(IDictionary<String, Object> dictionary, Type type, JavaScriptSerializer serializer)
+		public override WorkHours ReadJson(JsonReader reader, Type objectType, WorkHours existingValue, Boolean hasExistingValue, JsonSerializer serializer)
 		{
-			Int64 unboxed;
-			if(!dictionary.TryGetValue("Code", out Object value))
-				unboxed = WorkHours.MaxWorkHours;
-			else if(value is Int32 i)
-				unboxed = i;
-			else if(value is Int64 l)
-				unboxed= l;
-			else
-				unboxed = WorkHours.MaxWorkHours;
+			if(reader.TokenType == JsonToken.Null)
+				return new WorkHours(WorkHours.MaxWorkHours);
 
-			return new WorkHours(unboxed);
+			if(reader.TokenType == JsonToken.StartObject)
+			{
+				JObject obj = JObject.Load(reader);
+				if(obj.TryGetValue("Code", out JToken value))
+				{
+					Int64 code;
+					if(value.Type == JTokenType.Integer)
+						code = value.Value<Int64>();
+					else if(value.Type == JTokenType.String)
+						code = Int64.TryParse(value.Value<String>(), out Int64 result) ? result : WorkHours.MaxWorkHours;
+					else
+						code = WorkHours.MaxWorkHours;
+					
+					return new WorkHours(code);
+				}
+			}
+
+			return new WorkHours(WorkHours.MaxWorkHours);
 		}
 
-		public override IDictionary<String, Object> Serialize(Object obj, JavaScriptSerializer serializer)
+		public override void WriteJson(JsonWriter writer, WorkHours value, JsonSerializer serializer)
 		{
-			WorkHours wh = (WorkHours)obj;
-			return new Dictionary<String, Object> { { "Code", wh.Code } };
+			writer.WriteStartObject();
+			writer.WritePropertyName("Code");
+			writer.WriteValue(value.Code);
+			writer.WriteEndObject();
 		}
 	}
 }

@@ -1,39 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Web.Script.Serialization;
+using Newtonsoft.Json;
 
 namespace Plugin.Timers.Settings
 {
-	public class TimeSpanJsonConverter : JavaScriptConverter
+	public class TimeSpanJsonConverter : JsonConverter<TimeSpan>
 	{
-		public override IEnumerable<Type> SupportedTypes => new[] { typeof(TimeSpan), };
-
-		public override Object Deserialize(IDictionary<String, Object> dictionary, Type type, JavaScriptSerializer serializer)
-			=> new TimeSpan(GetValue(dictionary, "ticks"));
-
-		public override IDictionary<String, Object> Serialize(Object obj, JavaScriptSerializer serializer)
+		public override TimeSpan ReadJson(JsonReader reader, Type objectType, TimeSpan existingValue, Boolean hasExistingValue, JsonSerializer serializer)
 		{
-			TimeSpan timeSpan = (TimeSpan)obj;
+			if(reader.TokenType == JsonToken.Null)
+				return TimeSpan.Zero;
 
-			Dictionary<String, Object> result = new Dictionary<String, Object>{ { "ticks", timeSpan.Ticks }, };
+			if(reader.TokenType == JsonToken.StartObject)
+			{
+				reader.Read(); // Move to property name
+				if(reader.TokenType == JsonToken.PropertyName && (String)reader.Value == "ticks")
+				{
+					reader.Read(); // Move to value
+					Int64 ticks = Convert.ToInt64(reader.Value);
+					reader.Read(); // Move past EndObject
+					return new TimeSpan(ticks);
+				}
+			}
 
-			return result;
+			return TimeSpan.Zero;
 		}
 
-		private static Int64 GetValue(IDictionary<String, Object> dictionary, String key)
+		public override void WriteJson(JsonWriter writer, TimeSpan value, JsonSerializer serializer)
 		{
-			const Int64 DefaultValue = 0;
-
-			if(!dictionary.TryGetValue(key, out Object value))
-				return DefaultValue;
-			else if(value is Int32 i)
-				return i;
-			else if(value is Int64 l)
-				return l;
-			else if(value is String s)
-				return Int64.TryParse(s, out Int64 returnValue) ? returnValue : DefaultValue;
-			else
-				return DefaultValue;
+			writer.WriteStartObject();
+			writer.WritePropertyName("ticks");
+			writer.WriteValue(value.Ticks);
+			writer.WriteEndObject();
 		}
 	}
 }
