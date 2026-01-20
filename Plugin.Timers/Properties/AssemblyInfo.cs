@@ -5,4 +5,3 @@ using System.Runtime.InteropServices;
 [assembly: System.CLSCompliant(true)]
 
 [assembly: AssemblyDescription("Timers scheduler service plugin")]
-[assembly: AssemblyCopyright("Copyright © Danila Korablin 2018-2024")]
