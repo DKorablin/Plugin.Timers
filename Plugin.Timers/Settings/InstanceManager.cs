@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Ipc;
 using System.Threading;
 
 namespace Plugin.Timers.Settings
@@ -10,108 +6,88 @@ namespace Plugin.Timers.Settings
 	/// <summary>Application Instance Manager</summary>
 	public static class InstanceManager
 	{
+		private static Mutex _mutex;
+
 		/// <summary>Creates the single instance.</summary>
 		/// <param name="timerName">The name.</param>
 		/// <param name="callback">The callback.</param>
 		/// <returns></returns>
 		public static Boolean CreateSingleInstance(String timerName, EventHandler<InstanceCallbackEventArgs> callback)
 		{
-			EventWaitHandle eventWaitHandle = null;
-			String eventName = String.Join("-", Environment.MachineName, timerName);
+			if(String.IsNullOrEmpty(timerName))
+				throw new ArgumentNullException(nameof(timerName));
 
-			InstanceProxy.IsFirstInstance = false;
-			InstanceProxy.TimerName = timerName;
+			String mutexName = $"Global\\{Environment.MachineName}-{timerName}";
 
 			try
 			{
-				// try opening existing wait handle
-				eventWaitHandle = EventWaitHandle.OpenExisting(eventName);
-			} catch(WaitHandleCannotBeOpenedException)
-			{
-				// got exception = handle wasn't created yet
-				InstanceProxy.IsFirstInstance = true;
-			}
+				// Try to create a new mutex
+				_mutex = new Mutex(true, mutexName, out Boolean createdNew);
 
-			if(InstanceProxy.IsFirstInstance)
-			{
-				// init handle
-				eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, eventName);
-
-				// register wait handle for this instance (process)
-				ThreadPool.RegisterWaitForSingleObject(eventWaitHandle, WaitOrTimerCallback, callback, Timeout.Infinite, false);
-				eventWaitHandle.Close();
-
-				try
+				if(createdNew)
 				{
-					// register shared type (used to pass data between processes)
-					InstanceManager.RegisterRemoteType(timerName);
-				} catch(RemotingException)
-				{//Channel already registered
-					InstanceProxy.IsFirstInstance = false;
+					// This is the first instance
+					InstanceProxy.IsFirstInstance = true;
+					InstanceProxy.TimerName = timerName;
+
+					// Invoke callback if provided
+					if(callback != null)
+					{
+						callback(null, new InstanceCallbackEventArgs(true, timerName));
+					}
+
+					return true;
 				}
-			} else
-			{
-				// pass console arguments to shared object
-				InstanceManager.UpdateRemoteObject(timerName);
+				else
+				{
+					// Another instance already exists
+					InstanceProxy.IsFirstInstance = false;
+					InstanceProxy.TimerName = timerName;
 
-				// invoke (signal) wait handle on other process
-				if(eventWaitHandle != null)
-					eventWaitHandle.Set();
+					// Try to signal the existing instance (optional)
+					if(callback != null)
+					{
+						callback(null, new InstanceCallbackEventArgs(false, timerName));
+					}
+
+					// Release the mutex as we're not the first instance
+					_mutex?.Dispose();
+					_mutex = null;
+
+					return false;
+				}
 			}
-
-			return InstanceProxy.IsFirstInstance;
+			catch(UnauthorizedAccessException)
+			{
+				// Mutex exists but we don't have access
+				InstanceProxy.IsFirstInstance = false;
+				InstanceProxy.TimerName = timerName;
+				return false;
+			}
+			catch(Exception)
+			{
+				// On any error, assume we're not the first instance to be safe
+				InstanceProxy.IsFirstInstance = false;
+				InstanceProxy.TimerName = timerName;
+				_mutex?.Dispose();
+				_mutex = null;
+				return false;
+			}
 		}
 
-		/// <summary>Updates the remote object.</summary>
-		/// <param name="uri">The remote URI.</param>
-		private static void UpdateRemoteObject(String uri)
+		/// <summary>Releases the mutex for the current instance.</summary>
+		public static void ReleaseMutex()
 		{
-			// register net-pipe channel
-			IpcClientChannel clientChannel = new IpcClientChannel();
-			ChannelServices.RegisterChannel(clientChannel, true);
-
-			// get shared object from other process
-			InstanceProxy proxy =
-				Activator.GetObject(typeof(InstanceProxy),
-				$"ipc://{Environment.MachineName}{uri}/{uri}") as InstanceProxy;
-
-			// pass current command line args to proxy
-			if(proxy != null)
-				proxy.SetCommandLineArgs(InstanceProxy.IsFirstInstance, InstanceProxy.TimerName);
-
-			// close current client channel
-			ChannelServices.UnregisterChannel(clientChannel);
-		}
-
-		/// <summary>Registers the remote type.</summary>
-		/// <param name="uri">The URI.</param>
-		private static void RegisterRemoteType(String uri)
-		{
-			// register remote channel (net-pipes)
-			IpcServerChannel serverChannel = new IpcServerChannel(Environment.MachineName + uri);
-			ChannelServices.RegisterChannel(serverChannel, true);
-
-			// register shared type
-			RemotingConfiguration.RegisterWellKnownServiceType(
-				typeof(InstanceProxy), uri, WellKnownObjectMode.Singleton);
-
-			// close channel, on process exit
-			Process process = Process.GetCurrentProcess();
-			process.Exited += delegate { ChannelServices.UnregisterChannel(serverChannel); };
-		}
-
-		/// <summary>Wait Or Timer Callback Handler</summary>
-		/// <param name="state">The state.</param>
-		/// <param name="timedOut">if set to <c>true</c> [timed out].</param>
-		private static void WaitOrTimerCallback(Object state, Boolean timedOut)
-		{
-			// cast to event handler
-			EventHandler<InstanceCallbackEventArgs> callback = state as EventHandler<InstanceCallbackEventArgs>;
-			if(callback == null)
-				return;
-
-			// invoke event handler on other process
-			callback(state, new InstanceCallbackEventArgs(InstanceProxy.IsFirstInstance, InstanceProxy.TimerName));
+			try
+			{
+				_mutex?.ReleaseMutex();
+				_mutex?.Dispose();
+				_mutex = null;
+			}
+			catch
+			{
+				// Ignore errors during cleanup
+			}
 		}
 	}
 }
