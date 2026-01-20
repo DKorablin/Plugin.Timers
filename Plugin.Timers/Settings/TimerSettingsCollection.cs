@@ -49,7 +49,7 @@ namespace Plugin.Timers.Settings
 		public TimerSettingsCollection(String json)
 		{
 			if(!String.IsNullOrEmpty(json))
-				foreach(TimerSettingsItem item in PluginSettings.JavaScriptDeserialize<TimerSettingsItem[]>(json))
+				foreach(TimerSettingsItem item in Serializer.JavaScriptDeserialize<TimerSettingsItem[]>(json))
 					this.AddWithCheck(item);
 		}
 
@@ -86,7 +86,7 @@ namespace Plugin.Timers.Settings
 				Int32 loop = 0;
 				foreach(var item in this.ToArray())
 					data[loop++] = item;
-				return PluginSettings.JavaScriptSerialize(data);
+				return Serializer.JavaScriptSerialize(data);
 			} else return null;
 		}
 

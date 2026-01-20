@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Web.Script.Serialization;
 using Plugin.Timers.Settings;
 
 namespace Plugin.Timers
@@ -16,20 +15,6 @@ namespace Plugin.Timers
 		private readonly Plugin _plugin;
 		private TimerSettingsCollection _timerData;
 		private TimerSettingsItem _default = PluginSettings.StaticSettings;
-		private static JavaScriptSerializer _serializer;
-
-		private static JavaScriptSerializer Serializer
-		{
-			get
-			{
-				if(_serializer == null)
-				{
-					_serializer = new JavaScriptSerializer();
-					_serializer.RegisterConverters(new JavaScriptConverter[] { new TimeSpanJsonConverter(), new WorkHoursJsonConverter(), });
-				}
-				return _serializer;
-			}
-		}
 
 		[Browsable(false)]
 		public String TimerDataJson { get; set; }//WARN: Do not open it externally, as this will cause a desynchronization between TimerData and TimerDataJson.
@@ -48,9 +33,9 @@ namespace Plugin.Timers
 				{
 					this._default = String.IsNullOrEmpty(this.DefaultJson)
 						? PluginSettings.StaticSettings
-						: PluginSettings.JavaScriptDeserialize<TimerSettingsItem>(this.DefaultJson);
+						: Serializer.JavaScriptDeserialize<TimerSettingsItem>(this.DefaultJson);
 
-					this._default.PropertyChanged += Default_PropertyChanged;
+					this._default.PropertyChanged += this.Default_PropertyChanged;
 				}
 				return this._default;
 			}
@@ -93,22 +78,5 @@ namespace Plugin.Timers
 			this.TimerDataJson = this.TimerData.ToJson();
 			this._plugin.Host.Plugins.Settings(this._plugin).SaveAssemblyParameters();
 		}
-
-		/// <summary>Deserialize a string into an object</summary>
-		/// <typeparam name="T">Object type</typeparam>
-		/// <param name="json">String in JSON format</param>
-		/// <returns>Deserialized object</returns>
-		internal static T JavaScriptDeserialize<T>(String json)
-			=> String.IsNullOrEmpty(json)
-				? default
-				: PluginSettings.Serializer.Deserialize<T>(json);
-
-		/// <summary>Serialize object</summary>
-		/// <param name="item">Object to serialize</param>
-		/// <returns>String in JSON format</returns>
-		internal static String JavaScriptSerialize(Object item)
-			=> item == null
-				? null
-				: PluginSettings.Serializer.Serialize(item);
 	}
 }
