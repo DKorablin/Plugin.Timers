@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using Plugin.Timers.Settings;
+using SAL.Flatbed;
 
 namespace Plugin.Timers
 {
 	/// <summary>Base class with general logic for all timers</summary>
 	internal class TimerItemBase<T> where T : class, IDisposable
 	{
-		private readonly TraceSource _trace;
+		private readonly ITraceSource _trace;
 		private readonly TimerSettingsItem _settings;
 
 		public String TimerName => this._settings.TimerName;
@@ -32,7 +33,7 @@ namespace Plugin.Timers
 		/// <param name="settings">Timer settings</param>
 		/// <param name="state">Pointer to object that will be transferred to plugin on timer invocation</param>
 		/// <param name="callback">Plugin method callback</param>
-		protected TimerItemBase(TraceSource trace, TimerSettingsItem settings, Object state, EventHandler<EventArgs> callback)
+		protected TimerItemBase(ITraceSource trace, TimerSettingsItem settings, Object state, EventHandler<EventArgs> callback)
 		{
 			this._trace = trace;
 			this._settings = settings;
@@ -51,7 +52,7 @@ namespace Plugin.Timers
 				} catch(Exception exc)
 				{
 					if(!Utils.IsFatal(exc))//Threading timers will omit exception and it will totally ignored (We need to test it with all timers maybe only specific timer omit exceptions logging)
-						_trace.TraceData(TraceEventType.Error, 10, exc);
+						this._trace.TraceData(TraceEventType.Error, 10, exc);
 
 					throw;
 				}
@@ -60,11 +61,9 @@ namespace Plugin.Timers
 		/// <summary>Stop timer and remove callback method reference</summary>
 		public void Stop()
 		{
-			if(this.Timer != null)
-			{
-				this.Timer.Dispose();
-				this.Timer = null;
-			}
+			this.Timer?.Dispose();
+			this.Timer = null;
+
 			this.Callback = null;
 		}
 	}

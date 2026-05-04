@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Timers;
 using Plugin.Timers.Settings;
+using SAL.Flatbed;
 
 namespace Plugin.Timers
 {
@@ -13,7 +13,7 @@ namespace Plugin.Timers
 		/// <param name="settings">Timer settings</param>
 		/// <param name="state">Pointer to object that will be passed to plugin on timer invocation</param>
 		/// <param name="callback">Pointer to method callback on timer invocation</param>
-		public TimersTimerItem(TraceSource trace, TimerSettingsItem settings, Object state, EventHandler<EventArgs> callback)
+		public TimersTimerItem(ITraceSource trace, TimerSettingsItem settings, Object state, EventHandler<EventArgs> callback)
 			: base(trace, settings, state, callback)
 		{
 			base.Timer = new Timer(base.StartInterval);

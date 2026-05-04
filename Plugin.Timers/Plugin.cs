@@ -10,8 +10,7 @@ namespace Plugin.Timers
 	{
 		private PluginSettings _settings;
 
-		private TraceSource _trace;
-		internal TraceSource Trace => this._trace ?? (this._trace = Plugin.CreateTraceSource<Plugin>());
+		internal ITraceSource Trace { get; }
 
 		private TimerFactory _timers;
 		internal TimerFactory Timers => this._timers ?? (this._timers = new TimerFactory());
@@ -34,8 +33,11 @@ namespace Plugin.Timers
 
 		Object IPluginSettings.Settings => this.Settings;
 
-		public Plugin(IHost host)
-			=> this.Host = host ?? throw new ArgumentNullException(nameof(host));
+		public Plugin(IHost host, ITraceSource trace)
+		{
+			this.Host = host ?? throw new ArgumentNullException(nameof(host));
+			this.Trace = trace ?? throw new ArgumentNullException(nameof(trace));
+		}
 
 		/// <summary>Gets extended settings with custom UI that can be added to WinForms application</summary>
 		/// <returns></returns>
@@ -80,7 +82,7 @@ namespace Plugin.Timers
 			else
 			{
 				this.Trace.TraceEvent(TraceEventType.Start, 1, "Launching timer {0} with settings {1}. Interval: {2}.", key, timerName, settingsItem.Interval.ToString());
-				this.Timers.AddTimer(this._trace ,key, callback, state, settingsItem);
+				this.Timers.AddTimer(this.Trace ,key, callback, state, settingsItem);
 			}
 		}
 
@@ -116,15 +118,6 @@ namespace Plugin.Timers
 		{
 			this.Timers.Dispose();
 			return true;
-		}
-
-		private static TraceSource CreateTraceSource<T>(String name = null) where T : IPlugin
-		{
-			TraceSource result = new TraceSource(typeof(T).Assembly.GetName().Name + name);
-			result.Switch.Level = SourceLevels.All;
-			result.Listeners.Remove("Default");
-			result.Listeners.AddRange(System.Diagnostics.Trace.Listeners);
-			return result;
 		}
 	}
 }

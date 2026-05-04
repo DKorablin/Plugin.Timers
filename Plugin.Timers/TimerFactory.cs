@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Plugin.Timers.Settings;
+using SAL.Flatbed;
 
 namespace Plugin.Timers
 {
@@ -17,7 +18,7 @@ namespace Plugin.Timers
 		/// <param name="state">The object reference passed to the callback method</param>
 		/// <param name="settingsItem">The timer settings instance</param>
 		/// <exception cref="NotImplementedException">Unknown timer type specified</exception>
-		public void AddTimer(TraceSource trace, String key, EventHandler<EventArgs> callback, Object state, TimerSettingsItem settingsItem)
+		public void AddTimer(ITraceSource trace, String key, EventHandler<EventArgs> callback, Object state, TimerSettingsItem settingsItem)
 		{
 			ITimerItem timerState;
 			switch(settingsItem.Type)

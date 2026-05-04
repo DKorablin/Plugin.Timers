@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using Plugin.Timers.Settings;
+using SAL.Flatbed;
 
 namespace Plugin.Timers
 {
@@ -12,7 +12,7 @@ namespace Plugin.Timers
 		/// <param name="settings">Timer settings</param>
 		/// <param name="state">Pointer to be passed when the timer fires</param>
 		/// <param name="callback">Pointer to the callback method</param>
-		public WindowsTimerItem(TraceSource trace, TimerSettingsItem settings, Object state, EventHandler<EventArgs> callback)
+		public WindowsTimerItem(ITraceSource trace, TimerSettingsItem settings, Object state, EventHandler<EventArgs> callback)
 			: base(trace, settings, state, callback)
 		{
 			base.Timer = new System.Windows.Forms.Timer();
